@@ -2,7 +2,7 @@
 
 Easily import symbols from another Sketch file. 
 
-![Banner](hhttp://jroplet.com/public/import-symbols-512.png)
+![Banner](http://jroplet.com/public/import-symbols-512.png)
 
 ## Installing Plugins
 
