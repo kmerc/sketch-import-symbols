@@ -43,17 +43,14 @@ var importSymbols = function (context) {
 							var match = sourceSymbols[i].name() == targetSymbols[j].name();
 							
 							if(!match){
-								log("Not a match");
 								matches[i] = 0;
 							}else{
-								log("Yup it's a match");
 								matches[i] = 1;
 								break;
 							}
 						}
 						
 					}else{
-						//log( "Source: "+sourceSymbols[i].name+". Target: "+targetSymbols[j].name()+". Match: "+match );
 						doc.documentData().layerSymbols().addSymbolWithName_firstInstance(sourceSymbols[i].name(), sourceSymbols[i].newInstance());
 						addCount++;
 					}
