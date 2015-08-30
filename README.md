@@ -7,7 +7,7 @@ Easily import symbols from another Sketch file.
 ## Installing Plugins
 
 ### The conventional way:
-1. [Download the ZIP file with the Measure](https://github.com/kmerc/sketch-import-symbols/archive/master.zip)
+1. [Download the ZIP file](https://github.com/kmerc/sketch-import-symbols/archive/master.zip)
 2. Copy the contents to the plugin folder (Open up Sketch, and go to `Plugins` › `Reveal Plugins Folder…` to open it.)
 
 ### The quickest way:
