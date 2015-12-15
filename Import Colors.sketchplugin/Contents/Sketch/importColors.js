@@ -48,7 +48,7 @@ var importColors = function (context) {
 			//const targetChildren = doc.pages().valueForKeyPath("@distinctUnionOfArrays.children"); // Store current docs children to check against 
 
 			// Only do this if the selected file contains Colors
-			if (sourceColors) {
+			if (sourceColors.count() > 0) {
 				
 				// Iterate through each of the source file Colors
 				for (var i = 0; i < sourceColors.count(); i++){
@@ -92,7 +92,7 @@ var importColors = function (context) {
 				var matchedItems = matches.filter(function(a){ return a;}).length;
 				
 				// Simple check to display how many Colors added to the user
-				if(addCount == 0){
+				if(addCount == 0 && matchedItems > 0){
 					doc.showMessage("Nothing was imported. There were "+matchedItems+" Color values that matched. Boo.")
 			    }else if(addCount == 1){
 			    	doc.showMessage("1 Color was imported successfully. Sweet!");
