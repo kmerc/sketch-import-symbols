@@ -1,0 +1,24 @@
+{
+  "name": "Import Colors",
+  "description": "Plugins to import Document Colors from another Sketch file.",
+  "author": "Caleb Mercer",
+  "homepage": "https://github.com/kmerc/sketch-import-colors",
+  "version": 1.0,
+  "identifier": "com.kmerc.sketch.import-colors",
+  "updateURL": "https://github.com/kmerc/sketch-import-colors",
+  "compatibleVersion": 1,
+  "bundleVersion": 1,
+  "commands": [
+    {
+      "name": "Import Colors",
+      "identifier": "all",
+      "script": "importColors.js",
+      "handler": "importColors"
+    }
+  ],
+  "menu": {
+    "items": [
+      "all"
+    ]
+  }
+}
