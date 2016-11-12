@@ -1,17 +1,18 @@
 {
-  "name": "importSymbols",
-  "description": "Plugins to import symbols from another Sketch file.",
+  "name": "Import Symbols",
+  "description": "Plugin to import symbols from another Sketch file.",
   "author": "Caleb Mercer",
   "homepage": "https://github.com/kmerc/sketch-import-symbols",
-  "version": 1.0,
+  "version": 4.1,
   "identifier": "com.kmerc.sketch.import-plugin",
   "updateURL": "https://github.com/kmerc/sketch-import-symbols",
   "compatibleVersion": 1,
   "bundleVersion": 1,
   "commands": [
     {
-      "name": "importSymbols",
+      "name": "Import Symbols",
       "identifier": "all",
+      "shortcut": "ctrl shift i",
       "script": "importSymbols.js",
       "handler": "importSymbols"
     }
