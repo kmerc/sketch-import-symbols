@@ -23,10 +23,12 @@ _NOTE: If your Mac has not installed GitHub client, You need to install [GitHub 
 * Beta `~/Library/Application Support/com.bohemiancoding.sketch3/Plugins`
 
 ## FYI
-If the symbols name being imported matches the name of any symbol in the current/target document, it will be skipped.
+• If you have a Symbols page, then the imported symbols will be added here. If you do not already have a symbols page, then one will be created for you.
+
+• The previous version of this plugin skipped symbols with matched names - this update does not skip these, but will instead bring in symbols with the same names.
 
 ### Keyboard Shortcuts
-Currently there isn't any as this probably isn't a function you'll be needing every 2 seconds.
+`command` + `shift` + `i`
 
 ##Contact
 
