@@ -60,20 +60,42 @@ function getLastSymbol(symbols) {
 }
 
 /**
- * Find a symbol by name.
+ * Find a symbol by ID.
  * @param {NSArray} symbols
  * @param {String} id
  * @return {MSSymbolMaster|nil}
  */
-function findSymbol(symbols, id) {
+function findSymbolByID(symbols, id) {
+
+  var i = 0;
+  var len = symbols.count();
+  var importId;
+
+  for(; i < len; i++) {
+    importId = getLayerValue(symbols.objectAtIndex(i), 'import_id');
+    if (importId && importId.isEqualToString(id)) {
+      return symbols.objectAtIndex(i);
+    }
+  }
+
+  return nil;
+}
+
+/**
+ * Find a symbol by name.
+ * @param {NSArray} symbols
+ * @param {String} name
+ * @return {MSSymbolMaster|nil}
+ */
+function findSymbolByName(symbols, name) {
 
 	var i = 0;
 	var len = symbols.count();
-	var importId;
+	var symbolName;
 
 	for(; i < len; i++) {
-		importId = getLayerValue(symbols.objectAtIndex(i), 'import_id');
-		if (importId && importId.isEqualToString(id)) {
+		symbolName = symbols.objectAtIndex(i).name();
+		if (symbolName && symbolName.isEqualToString(name)) {
 			return symbols.objectAtIndex(i);
 		}
 	}
@@ -85,8 +107,9 @@ function findSymbol(symbols, id) {
  * Add a list of symbols to a document.
  * @param {MSDocument} doc
  * @param {NSArray} sourceSymbols
+ * @param {String} replaceBy Replace by name or ID?
  */
-function addSymbols(doc, sourceSymbols) {
+function addSymbols(doc, sourceSymbols, replaceBy) {
 
 	var symbols = getSymbols(doc);
 	var lastSymbol = getLastSymbol(symbols);
@@ -100,7 +123,7 @@ function addSymbols(doc, sourceSymbols) {
 	showSymbolsPage(doc);
 
 	for(; i < len; i++) {
-		ret = addSymbol(doc, symbols, sourceSymbols.objectAtIndex(i), lastSymbol);
+		ret = addSymbol(doc, symbols, sourceSymbols.objectAtIndex(i), lastSymbol, replaceBy);
 		(ret.type === 'add' ? addCount++ : updateCount++);
 		lastSymbol = ret.symbol;
 	}
@@ -109,20 +132,25 @@ function addSymbols(doc, sourceSymbols) {
 }
 
 /**
- * Add a symbol to a document. If a symbol with that name already exists, replace it
+ * Add a symbol to a document. If a symbol with that name or ID already exists, replace it
  * and all the references to it. If it does not, place after the last symbol.
  * @param {MSDocument} doc
  * @param {NSArray} docSymbols
  * @param {MSSymbolMaster} symbol
  * @param {MSSymbolMaster|nil} lastSymbol
+ * @param {String} replaceBy Replace by name or ID?
  * @return {Object}
  */
-function addSymbol(doc, docSymbols, symbol, lastSymbol) {
+function addSymbol(doc, docSymbols, symbol, lastSymbol, replaceBy) {
 
-	var symbolID = symbol.symbolID();
+  replaceBy = replaceBy || 'id';
+
+  var symbolID = symbol.symbolID();
+	var symbolName = symbol.name();
 	var clonedSymbol = cloneSymbolAndPositionRelatively(symbol, lastSymbol);
-	var existingSymbol = findSymbol(docSymbols, symbolID);
-	setLayerValue(clonedSymbol, 'import_id', symbolID);
+	var existingSymbol = replaceBy === 'id' ? findSymbolByID(docSymbols, symbolID) : findSymbolByName(docSymbols, symbolName);
+  setLayerValue(clonedSymbol, 'import_id', symbolID);
+	setLayerValue(clonedSymbol, 'import_name', symbolName);
 
 	return {
 		type: existingSymbol ? 'update' : 'add',
@@ -250,10 +278,30 @@ function getLayerValue(layer, name) {
 }
 
 /**
- * Exported function run when plugin is called.
+ * Import symbols by ID.
  * @param {Object} context
  */
-function importSymbols(context) {
+function importSymbolsByID(context) {
+
+  // Prompt for a file
+  var panel = openPrompt();
+  if (panel.runModal() !== NSOKButton) return;
+  var fileURL = panel.URL();
+
+  command = context.command;
+
+  // Try to open the file, get its symbols, add them to the current document, then close the file.
+  var doc;
+  if (doc = tryToOpenFile(fileURL)) addSymbols(context.document, getSymbols(doc));
+  else context.document.showMessage(FILE_SELECTION_ERROR);
+  tryToCloseFile(doc);
+}
+
+/**
+ * Import symbols by name.
+ * @param {Object} context
+ */
+function importSymbolsByName(context) {
 
 	// Prompt for a file
 	var panel = openPrompt();
@@ -264,7 +312,7 @@ function importSymbols(context) {
 
 	// Try to open the file, get its symbols, add them to the current document, then close the file.
 	var doc;
-	if (doc = tryToOpenFile(fileURL)) addSymbols(context.document, getSymbols(doc));
+	if (doc = tryToOpenFile(fileURL)) addSymbols(context.document, getSymbols(doc), 'name');
 	else context.document.showMessage(FILE_SELECTION_ERROR);
 	tryToCloseFile(doc);
 }
