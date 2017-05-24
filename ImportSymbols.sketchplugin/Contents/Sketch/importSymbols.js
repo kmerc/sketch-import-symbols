@@ -46,7 +46,7 @@ function tryToCloseFile(doc) {
  * @return {NSArray}
  */
 function getSymbols(doc) {
-	return doc.documentData().allSymbols()
+	return doc.documentData().allSymbols();
 }
 
 /**
@@ -71,7 +71,7 @@ function findSymbolByID(symbols, id) {
   var len = symbols.count();
   var importId;
 
-  for(; i < len; i++) {
+  for (; i < len; i++) {
     importId = getLayerValue(symbols.objectAtIndex(i), 'import_id');
     if (importId && importId.isEqualToString(id)) {
       return symbols.objectAtIndex(i);
@@ -93,7 +93,7 @@ function findSymbolByName(symbols, name) {
 	var len = symbols.count();
 	var symbolName;
 
-	for(; i < len; i++) {
+	for (; i < len; i++) {
 		symbolName = symbols.objectAtIndex(i).name();
 		if (symbolName && symbolName.isEqualToString(name)) {
 			return symbols.objectAtIndex(i);
@@ -122,13 +122,46 @@ function addSymbols(doc, sourceSymbols, replaceBy) {
 
 	showSymbolsPage(doc);
 
-	for(; i < len; i++) {
+	for (; i < len; i++) {
 		ret = addSymbol(doc, symbols, sourceSymbols.objectAtIndex(i), lastSymbol, replaceBy);
 		(ret.type === 'add' ? addCount++ : updateCount++);
 		lastSymbol = ret.symbol;
 	}
 
+	// Look for nested symbols within the newly created symbols
+	matchNestedSymbols(getSymbols(doc));
+
 	doc.showMessage(addCount + ' symbols added, ' + updateCount + ' updated.');
+}
+
+/**
+ * Find nested symbols and replace them if they are disconnected.
+ * @param  {NSArray} symbols
+ */
+function matchNestedSymbols(symbols) {
+
+	var i = 0;
+	var len = symbols.count();
+
+	for (; i < len; i++) {
+		matchNestedSymbol(symbols.objectAtIndex(i), symbols);
+	}
+}
+
+/**
+ * Find any layers for a symbol that are also symbols and re-link them if they have no master.
+ * @param  {Mixed} symbol
+ * @param  {NSArray} symbols
+ */
+function matchNestedSymbol(symbol, symbols) {
+	var layers = symbol.layers();
+	var i = 0;
+	var len = layers.count();
+	for (; i < len; i++) {
+		if (layers.objectAtIndex(i).className().isEqualToString('MSSymbolInstance') && !layers.objectAtIndex(i).symbolMaster()) {
+			layers.objectAtIndex(i).changeInstanceToSymbol(findSymbolByName(symbols, layers.objectAtIndex(i).name()));
+		}
+	}
 }
 
 /**
@@ -204,6 +237,7 @@ function replaceSymbol(doc, oldSymbol, newSymbol) {
  */
 function updateSymbolInstances(oldSymbol, newSymbol) {
 	var instances = oldSymbol.allInstances();
+	log(oldSymbol);
 	var i = 0;
 	var len = instances.count();
 	for (; i < len; i++) {
