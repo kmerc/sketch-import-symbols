@@ -50,13 +50,17 @@ function getSymbols(doc) {
 }
 
 /**
- * Get the last symbol in an array.
+ * Get the last symbol on the page (bottom-most, right-most).
  * @param {NSArray} symbols
  * @return {MSSymbolMaster|nil}
  */
-function getLastSymbol(symbols) {
-	var len = symbols.count();
-	return len > 0 ? symbols[len - 1] : nil;
+function getBottomSymbol(symbols) {
+	return symbols.slice().sort(function(a, b) {
+		var aRect = a.rect().origin;
+		var bRect = b.rect().origin;
+		// A is above B, -1. A and B are horizontally equal, A is left of B, -1; B is left of A, 1; A and B are overlapping, 0. B is above A, 1.
+		return aRect.y < bRect.y ? -1 : (aRect.x < bRect.x ? -1 : (aRect.x === bRect.x ? 0 : 1));
+	}).pop();
 }
 
 /**
@@ -112,7 +116,7 @@ function findSymbolByName(symbols, name) {
 function addSymbols(doc, sourceSymbols, replaceBy) {
 
 	var symbols = getSymbols(doc);
-	var lastSymbol = getLastSymbol(symbols);
+	var lastSymbol = getBottomSymbol(symbols);
 
 	var i = 0;
 	var len = sourceSymbols.count();
@@ -237,7 +241,6 @@ function replaceSymbol(doc, oldSymbol, newSymbol) {
  */
 function updateSymbolInstances(oldSymbol, newSymbol) {
 	var instances = oldSymbol.allInstances();
-	log(oldSymbol);
 	var i = 0;
 	var len = instances.count();
 	for (; i < len; i++) {
